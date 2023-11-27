@@ -1,5 +1,6 @@
 import requests
 import gzip
+import csv
 import re
 import os
 from sqlalchemy import create_engine
@@ -10,16 +11,21 @@ class DataPipeline:
     def __init__(self, link_traffic, link_airquality):
         self.link_traffic =  link_traffic
         self.link_airquality = link_airquality
+        self.stations = [
+            "mc010", "mc032", "mc042", "mc077", "mc085", "mc174"
+        ] #The station codes of the messing stations we want to examine
+        self.year = '2023'
         
     def extract_data(self, stations, year):
+        output_folder = r".\data"
         for i in range(1,13):
             
             month = str(i).zfill(2)
-            output_folder = r'.\data'
             
             #Extracting traffic data
             response_traffic = requests.get(f'{self.link_traffic}/mq_hr_{year}_{month}.csv.gz')
             if response_traffic:
+ 
                 #If the response is succesful use BytesIO to create a file-like object from the response content
                 compressed_file = BytesIO(response_traffic.content)
                 
@@ -93,7 +99,6 @@ class DataPipeline:
         for filename in os.listdir(directory):
             f = os.path.join(directory, filename)
             if re.match(pattern, os.path.basename(f)):
-            #if f != os.path.join(directory, '.gitkeep') and f != os.path.join(directory, 'traffic_data.csv'):
                 
                 #Formatting our data to look the way we want
                 headers = ['datetime', 'PMO10', 'PMO2.5', 'NO2', 'NO', 'NOx', 'O3']
@@ -115,23 +120,22 @@ class DataPipeline:
         airq_df.to_sql('airQuality', engine, index = False, if_exists = 'replace')
         
         if os.path.exists('./data/UrbanAirQualityInMotion.sqlite'):
-            print('UrbanAirQualityInMotion.sqlite was created succesfully')
+            print('UrbanAirQualityInMotion.sqlite was created')
         else:
             print('An error occured when loadind the data')
+            
+    def run_data_pipeline(self):
+        
+        self.extract_data(self.stations, self.year)
+        traffic_df, airq_df = self.transform_data()
+        self.load_data(traffic_df, airq_df)
+
+        print("Data pipeline completed successfully.")
         
                 
 
 link_traffic = "https://mdhopendata.blob.core.windows.net/verkehrsdetektion/2023/Messquerschnitte%20(fahrtrichtungsbezogen)"
 link_airquality = "https://luftdaten.berlin.de/station"
 pipeline = DataPipeline(link_traffic, link_airquality)
+pipeline.run_data_pipeline()
 
-stations = [
-    "mc010", "mc032", "mc042", "mc077", "mc085", "mc174"
-] #The station codes of the messing stations we want to examine
-year = '2023'
-
-pipeline.extract_data(stations, year)
-
-traffic_df, airq_df = pipeline.transform_data()
-
-pipeline.load_data(traffic_df, airq_df)
