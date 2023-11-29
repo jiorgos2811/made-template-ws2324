@@ -1,5 +1,20 @@
 import pandas as pd
-from sqlalchemy import create_engine, Column, Integer, String, Float, MetaData, Table
+from sqlalchemy import create_engine, Column, Integer, String, Float
+from sqlalchemy.orm import declarative_base, sessionmaker
+
+Base = declarative_base()
+class Trainstops(Base):
+    __tablename__ = "trainstops"
+    
+    eva_nr = Column('EVA_NR', Integer, primary_key=True)
+    ds100 = Column('DS100', String)
+    ifopt = Column('IFOPT', String)
+    name = Column('NAME', String)
+    verkehr = Column('Verkehr', String)
+    land = Column('Laenge', Float)
+    breite = Column('Breite', Float)
+    betreiber_name = Column('Betreiber_Name', String)
+    betreiber_nr = Column('Betreiber_Nr', Integer)
 
 def clean_data(data):
     trainstops = pd.read_csv(data, delimiter= ';')
@@ -26,29 +41,26 @@ def store_data(trainstops):
     
     # Define the SQLite database engine
     engine = create_engine('sqlite:///trainstops.sqlite', echo=True)
+    Base.metadata.create_all(bind = engine)
+    Session = sessionmaker(bind = engine)
+    session = Session()
+    
+    #Write every row in the db
+    for index, row in trainstops.iterrows():
+            trainstop_instance = Trainstops(
+                eva_nr=row['EVA_NR'],
+                ds100=row['DS100'],
+                ifopt=row['IFOPT'],
+                name=row['NAME'],
+                verkehr=row['Verkehr'],
+                land=row['Laenge'],
+                breite=row['Breite'],
+                betreiber_name=row['Betreiber_Name'],
+                betreiber_nr=row['Betreiber_Nr']
+            )
+            session.add(trainstop_instance)
 
-    # Define metadata
-    metadata = MetaData()
-
-    # Define the table structure
-    trainstops_table = Table('trainstops', metadata,
-        Column('EVA_NR', Integer, primary_key=True),
-        Column('DS100', String),
-        Column('IFOPT', String),
-        Column('NAME', String),
-        Column('Verkehr', String),
-        Column('Laenge', Float),
-        Column('Breite', Float),
-        Column('Betreiber_Name', String),
-        Column('Betreiber_Nr', Integer)
-    )
-
-    # Create the table in the database
-    metadata.create_all(engine)
-
-    # Insert data into the table
-    trainstops.to_sql('trainstops', engine, if_exists='replace', index=False)
-
+    session.commit()
 
 data = "https://download-data.deutschebahn.com/static/datasets/haltestellen/D_Bahnhof_2020_alle.CSV"
 df = clean_data(data)
