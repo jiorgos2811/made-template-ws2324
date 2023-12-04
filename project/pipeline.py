@@ -130,12 +130,12 @@ class DataPipeline:
         traffic_df, airq_df = self.transform_data()
         self.load_data(traffic_df, airq_df)
 
-        print("Data pipeline completed successfully.")
-        
-                
+        print("Data pipeline completed successfully.")   
 
-link_traffic = "https://mdhopendata.blob.core.windows.net/verkehrsdetektion/2023/Messquerschnitte%20(fahrtrichtungsbezogen)"
-link_airquality = "https://luftdaten.berlin.de/station"
-pipeline = DataPipeline(link_traffic, link_airquality)
-pipeline.run_data_pipeline()
+if __name__ == "__main__":
+    link_traffic = "https://mdhopendata.blob.core.windows.net/verkehrsdetektion/2023/Messquerschnitte%20(fahrtrichtungsbezogen)"
+    link_airquality = "https://luftdaten.berlin.de/station"
+    
+    pipeline = DataPipeline(link_traffic, link_airquality)
+    pipeline.run_data_pipeline()
 
