@@ -1,0 +1,1 @@
+pytest ./project/pipeline_test.py
