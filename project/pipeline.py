@@ -17,7 +17,7 @@ class DataPipeline:
         self.year = '2023'
         
     def extract_data(self, stations, year):
-        output_folder = r".\data"
+        output_folder = "./data"
         for i in range(1,13):
             
             month = str(i).zfill(2)
