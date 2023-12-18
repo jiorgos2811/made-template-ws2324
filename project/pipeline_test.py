@@ -8,7 +8,6 @@ current_dir = os.path.dirname(__file__)
 parent_dir = os.path.dirname(current_dir)
 db_path = os.path.join(parent_dir, "data", "UrbanAirQualityInMotion.sqlite")
 
-@pytest.mark.dependency()
 def test_data_retrieval():
     """Check if the expected csv files were
     downloaded and saved appropriately"""
@@ -21,8 +20,6 @@ def test_data_retrieval():
     for station in data_pipeline.stations:
         assert os.path.exists(f'./data/{station}.csv')
     
-# Only execute test for the complete datapipeline if the previous tests passed
-@pytest.mark.dependency(depends=["test_data_retrieval"])
 def test_data_formating(): 
     """Check if the sqlite db was created and if it contains the expected tables"""
     
