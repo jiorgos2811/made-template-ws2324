@@ -33,7 +33,8 @@ class DataPipeline:
                 with gzip.open(compressed_file, 'rt') as f:
 
                     # Save the decompressed content to a file
-                    with open(f'{output_folder}/traffic_data.csv', 'a') as traffic_data:
+                    file_path = os.path.join(output_folder, 'traffic_data.csv')
+                    with open(file_path, 'a') as traffic_data:
                         traffic_data.write(f.read())
 
                 print(f'Traffic file downloaded and decompressed successfully for year {year} month {month}.')
@@ -59,7 +60,8 @@ class DataPipeline:
                                                         end%5Bhour%5D=00''')
 
                 if response_stations:
-                    with open(f'{output_folder}/{station}.csv', 'a', encoding='utf-8') as station_data:
+                    file_path = os.path.join(output_folder, f'{station}.csv')
+                    with open(file_path, 'a', encoding='utf-8') as station_data:
                         # spliting response.content into a list of lines in order not to include the first 6 lines of each file that are irrelevant
                         content_lines = response_stations.content.decode('utf-8').split('\n')
                         station_data.write('\n'.join(content_lines[6:])) #Saving the rejoined response
