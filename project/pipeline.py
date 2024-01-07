@@ -1,6 +1,5 @@
 import requests
 import gzip
-import csv
 import re
 import os
 from sqlalchemy import create_engine
@@ -49,15 +48,10 @@ class DataPipeline:
                 #Edge case for changing the year. Opted instead of collecting data until 01.01.202X+1 to collect until 31.12.202X
                 if next_month == '13':
                     next_month = 12
-                    response_stations = requests.get(f'''{self.link_airquality}/{station}.csv?group=pollution&
-                                                period=1h&timespan=custom&start%5Bdate%5D=01.{month}.{year}&
-                                                    start%5Bhour%5D=01&end%5Bdate%5D=31.{next_month}.{year}&
-                                                        end%5Bhour%5D=23''')
-                else:
-                    response_stations = requests.get(f'''{self.link_airquality}/{station}.csv?group=pollution&
-                                                period=1h&timespan=custom&start%5Bdate%5D=01.{month}.{year}&
-                                                    start%5Bhour%5D=02&end%5Bdate%5D=01.{next_month}.{year}&
-                                                        end%5Bhour%5D=00''')
+                response_stations = requests.get(f'''{self.link_airquality}/{station}.csv?group=pollution&
+                                            period=1h&timespan=custom&start%5Bdate%5D=01.{month}.{year}&
+                                                start%5Bhour%5D=01&end%5Bdate%5D=31.{next_month}.{year}&
+                                                    end%5Bhour%5D=23''')
 
                 if response_stations:
                     file_path = os.path.join(output_folder, f'{station}.csv')
@@ -103,7 +97,7 @@ class DataPipeline:
             if re.match(pattern, os.path.basename(f)):
                 
                 #Formatting our data to look the way we want
-                headers = ['datetime', 'PMO10', 'PMO2.5', 'NO2', 'NO', 'NOx', 'O3']
+                headers = ['datetime', 'PM10', 'PM2.5', 'NO2', 'NO', 'NOx', 'O3']
                 airq_df = pd.read_csv(f, delimiter=';', header=None)
                 airq_df = airq_df.iloc[:, 0:7] # Drop extra columns. I want to have the same metrics for all stations
                 airq_df.columns = headers
