@@ -2,7 +2,9 @@ from urllib import request
 from zipfile import ZipFile
 import os
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Column, Integer, String, Float
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 class Exercise4:
     
@@ -55,8 +57,30 @@ class Exercise4:
             raise ValueError('Geraet aktiv must be either "Ja" or "Nein"')
         
     def load(self, df):
-        engine = create_engine('sqlite:///temperatures.sqlite')
-        df.to_sql('temperatures', engine, index = False, if_exists = 'replace')
+        Base = declarative_base()
+
+        class Temperature(Base):
+            __tablename__ = 'temperatures'
+
+            Geraet = Column('Geraet', Integer, primary_key=True)
+            Hersteller = Column(String)
+            Model = Column(String)
+            Monat = Column(Integer)
+            Temperatur = Column(Float)
+            Batterietemperatur = Column(Float)
+            Geraet_aktiv = Column(Integer)
+
+        # Create SQLite database
+        db_path = "temperatures.sqlite"
+        engine = create_engine(f'sqlite:///{db_path}')
+        Base.metadata.create_all(engine)
+
+        # Insert data into the database
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        df.to_sql(Temperature.__tablename__, engine, index=False, if_exists='replace')
+        session.commit()
+        session.close()
 
     
     def run(self):
