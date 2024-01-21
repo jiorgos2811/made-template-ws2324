@@ -54,7 +54,7 @@ class Exercise4:
             raise ValueError('Geraet aktiv must be either "Ja" or "Nein"')
         
     def load(self, df):
-        engine = create_engine('sqlite:///./temperatures.sqlite')
+        engine = create_engine('sqlite:///temperatures.sqlite')
         df.to_sql('temperatures', engine, index = False, if_exists = 'replace')
 
     
