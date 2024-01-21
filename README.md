@@ -10,6 +10,8 @@
 
 ## Overview
 The project aims to address the declining air quality in urban centers, specifically focusing on the impact of vehicular emissions on Berlin's air quality in 2023. Through exploratory data analysis, correlation analysis, spatial analysis, and time series analysis, the project seeks to visualize patterns, identify pollutants affected by traffic, locate pollution hotspots, and discern temporal trends. The results will provide data-driven insights for local authorities and environmental organizations to implement measures aimed at reducing pollution and enhancing the quality of life for Berlin's residents.
+
+The report
 ## Context
 This repository is the result of my participation in the course [Advanced Methods of Software Engineering](https://oss.cs.fau.de/teaching/specific/amse/) provided by the [Professorship of Open-Source Software](https://oss.cs.fau.de) from FAU. <br>
 The assignment entailed creating a Data Engineering Project that utilizes a minimum of two publicly accessible datasources. The objective was to employ an automated datapipeline to process these sources, ultimately presenting insights derived from the results.
