@@ -24,6 +24,7 @@ class Exercise4:
         with open('./exercises/data.csv', 'r') as infile, open('./exercises/data_dot.csv', 'w') as outfile:
             for line in infile:
                 
+                #For some reason this is the only way I got the file into the right format for pandas
                 columns = line.strip().split(';')
                 modified_line = ';'.join(columns[0:11]) + '\n' #Rejoin columns 0 through 11 since it has the data that intrests us
                 modified_line = modified_line.replace(',', '.')
