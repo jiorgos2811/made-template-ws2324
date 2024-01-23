@@ -2,9 +2,7 @@ from urllib import request
 from zipfile import ZipFile
 import os
 import pandas as pd
-from sqlalchemy import create_engine, Column, Integer, String, Float
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
 
 class Exercise4:
     
@@ -57,43 +55,8 @@ class Exercise4:
             raise ValueError('Geraet aktiv must be either "Ja" or "Nein"')
         
     def load(self, df):
-        Base = declarative_base()
-
-        class Temperature(Base):
-            __tablename__ = 'temperatures'
-
-            id = Column(Integer, primary_key=True, autoincrement=True)
-            Geraet = Column('Geraet', Integer)
-            Hersteller = Column('Hersteller', String)
-            Model = Column('Model', String)
-            Monat = Column('Monat', Integer)
-            Temperatur = Column('Temperatur', Float)
-            Batterietemperatur = Column('Batterietemperatur', Float)
-            Geraet_aktiv = Column('Geraet aktiv', String)
-
-        # Create SQLite database
-        db_path = "temperatures.sqlite"
-        engine = create_engine(f'sqlite:///{db_path}')
-        Base.metadata.create_all(engine)
-
-        # Insert data into the database
-        Session = sessionmaker(bind=engine)
-        session = Session()
-        
-        #Write every row in the db
-        for index, row in df.iterrows():
-                df_instance = Temperature(
-                    Geraet=row['Geraet'],
-                    Hersteller=row['Hersteller'],
-                    Model=row['Model'],
-                    Monat=row['Monat'],
-                    Temperatur=row['Temperatur'],
-                    Batterietemperatur=row['Batterietemperatur'],
-                    Geraet_aktiv=row['Geraet aktiv']
-                )
-                session.add(df_instance)
-        session.commit()
-        session.close()
+        engine = create_engine('sqlite:///temperatures.sqlite', echo=True)
+        df.to_sql('temperatures', engine, index = False, if_exists = 'replace')
     
     def run(self):
         self.donwload_and_unzip()
@@ -103,7 +66,6 @@ class Exercise4:
         self.load(df)
         os.remove("./exercises/data.csv")
         os.remove("./exercises/data_dot.csv")
-
 
 url = "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip"
 ex = Exercise4(url)
