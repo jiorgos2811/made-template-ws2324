@@ -62,13 +62,14 @@ class Exercise4:
         class Temperature(Base):
             __tablename__ = 'temperatures'
 
-            Geraet = Column('Geraet', Integer, primary_key=True)
-            Hersteller = Column(String)
-            Model = Column(String)
-            Monat = Column(Integer)
-            Temperatur = Column(Float)
-            Batterietemperatur = Column(Float)
-            Geraet_aktiv = Column(Integer)
+            id = Column(Integer, primary_key=True, autoincrement=True)
+            Geraet = Column('Geraet', Integer)
+            Hersteller = Column('Hersteller', String)
+            Model = Column('Model', String)
+            Monat = Column('Monat', Integer)
+            Temperatur = Column('Temperatur', Float)
+            Batterietemperatur = Column('Batterietemperatur', Float)
+            Geraet_aktiv = Column('Geraet aktiv', String)
 
         # Create SQLite database
         db_path = "temperatures.sqlite"
@@ -78,10 +79,21 @@ class Exercise4:
         # Insert data into the database
         Session = sessionmaker(bind=engine)
         session = Session()
-        df.to_sql(Temperature.__tablename__, engine, index=False, if_exists='replace')
+        
+        #Write every row in the db
+        for index, row in df.iterrows():
+                df_instance = Temperature(
+                    Geraet=row['Geraet'],
+                    Hersteller=row['Hersteller'],
+                    Model=row['Model'],
+                    Monat=row['Monat'],
+                    Temperatur=row['Temperatur'],
+                    Batterietemperatur=row['Batterietemperatur'],
+                    Geraet_aktiv=row['Geraet aktiv']
+                )
+                session.add(df_instance)
         session.commit()
         session.close()
-
     
     def run(self):
         self.donwload_and_unzip()
