@@ -13,7 +13,7 @@ class Exercise4:
     def donwload_and_unzip(self):
         request.urlretrieve(self.url, filename="./datafile.zip")
 
-        with ZipFile(r".\datafile.zip", 'r') as zip_ref:
+        with ZipFile("datafile.zip", 'r') as zip_ref:
             zip_ref.extractall("./exercises")
         zip_ref.close()
         os.remove("./datafile.zip")
